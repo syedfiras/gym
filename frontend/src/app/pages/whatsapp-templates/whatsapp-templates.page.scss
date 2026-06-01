@@ -1,0 +1,72 @@
+.template-card {
+  margin-bottom: 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  background: white;
+
+  .card-header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    ion-card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--ion-color-dark);
+    }
+  }
+
+  ion-card-content {
+    padding-top: 0;
+
+    .template-preview {
+      white-space: pre-wrap;
+      color: var(--ion-color-medium);
+      font-size: 0.95rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  }
+
+  .card-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0 8px 8px;
+  }
+}
+
+.empty-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50vh;
+  color: var(--ion-color-medium);
+  font-style: italic;
+}
+
+.form-item {
+  --background: transparent;
+  margin-bottom: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+
+  ion-label {
+    color: var(--ion-color-medium);
+  }
+}
+
+.hint-text {
+  font-size: 0.85rem;
+  color: var(--ion-color-medium);
+  margin-top: 8px;
+  padding: 0 16px;
+}
+
+body.dark {
+  .template-card {
+    background: var(--ion-card-background);
+  }
+}

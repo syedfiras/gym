@@ -1,0 +1,404 @@
+        .search-button-container {
+          display: flex;
+          /* Use flexbox for horizontal layout */
+          align-items: center;
+          /* Vertically align items */
+          gap: 0.75rem;
+          /* Space between search and button (Tailwind 'gap-3') */
+          padding: 1rem;
+          /* Padding around the container */
+          border-bottom: 1px solid #e2e8f0;
+          /* Subtle border at the bottom */
+        }
+
+        .custom-search-input {
+          background: white;
+          flex-grow: 1;
+          /* Allows the input to take up available space */
+          padding: 0.75rem 1rem;
+          /* Padding inside the input */
+          border: 1px solid #cbd5e1;
+          /* Light gray border */
+          border-radius: 24px;
+          /* Rounded corners (Tailwind 'rounded-lg') */
+          font-size: 1rem;
+          /* Standard font size */
+          outline: none;
+          /* Remove default outline on focus */
+          transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        .custom-search-input:focus {
+          border-color: #3b82f6;
+          /* Blue border on focus (Tailwind 'blue-500') */
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+          /* Subtle blue shadow on focus */
+        }
+
+        .custom-search-input::placeholder {
+          color: #64748b;
+          /* Placeholder text color (Tailwind 'slate-500') */
+        }
+
+        .custom-add-button {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0.75rem 1.25rem;
+          /* Padding for the button */
+          background-color: var(--ion-color-primary);
+          color: #ffffff;
+          /* White text color */
+          border: none;
+          border-radius: 24px;
+          /* Rounded corners */
+          font-size: 0.95rem;
+          /* Slightly smaller font for button */
+          font-weight: 500;
+          /* Medium font weight */
+          cursor: pointer;
+          transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+          white-space: nowrap;
+          /* Prevent text wrapping */
+        }
+
+        .custom-add-button:hover {
+          background-color: var(--ion-color-primary);
+          /* Darker blue on hover */
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+          /* Shadow on hover */
+        }
+
+        /* Filters Container */
+        .filters-container {
+          background: #ffffff;
+          border-radius: 16px;
+          box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+          padding: 1.2rem;
+          margin: 0 16px 1rem 16px;
+
+          .filter-section {
+            .filter-title {
+              margin: 0 0 0.8rem;
+              font-size: 0.95rem;
+              font-weight: 500;
+              color: #444;
+            }
+
+            .filter-chips {
+              display: flex;
+              flex-wrap: nowrap;
+              gap: 0.7rem;
+              overflow-x: auto;
+              -webkit-overflow-scrolling: touch;
+
+              /* Hide scrollbar but allow scrolling */
+              scrollbar-width: none;
+              /* Firefox */
+              -ms-overflow-style: none;
+              /* IE and Edge */
+
+              &::-webkit-scrollbar {
+                display: none;
+                /* Chrome, Safari, Opera */
+              }
+
+              .filter-chip {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 0.5rem 1rem;
+                border-radius: 50px;
+                background: #f5f5f5;
+                color: #666;
+                font-size: 0.9rem;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                border: 1px solid #eee;
+                white-space: nowrap;
+                flex-shrink: 0;
+
+                ion-icon {
+                  font-size: 1.1rem;
+                }
+
+                &:hover {
+                  background: #eaeaea;
+                }
+
+                &.active {
+                  background: #e8f4ff;
+                  color: #1976d2;
+                  border-color: #b3d7ff;
+                }
+              }
+            }
+          }
+        }
+
+        .members-list {
+          padding: 0;
+          background: transparent;
+        }
+
+        .member-item {
+          display: flex;
+          align-items: center;
+          padding: 16px;
+          background: rgba(255, 255, 255, 0.8);
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(255, 255, 255, 0.5);
+          margin: 8px 16px;
+          border-radius: 12px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+          cursor: pointer;
+          transition: all 0.2s ease;
+
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+          }
+
+          &:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+          }
+        }
+
+        .member-avatar {
+          width: 56px;
+          height: 56px;
+          border-radius: 50%;
+          overflow: visible;
+          margin-right: 16px;
+          cursor: pointer;
+          position: relative;
+          transition: transform 0.2s ease;
+
+          &:hover {
+            transform: scale(1.05);
+          }
+
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+          }
+        }
+
+        .member-info {
+          flex: 1;
+          min-width: 0;
+          position: relative;
+
+          .member-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0 0 4px 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+
+          .member-status {
+            display: flex;
+            align-items: center;
+          }
+        }
+
+        /* PT Badge on Avatar - Solid colors for Android WebView compatibility */
+        .pt-badge-avatar {
+          position: absolute;
+          bottom: -2px;
+          right: -2px;
+          width: 24px;
+          height: 24px;
+          background-color: #f59e0b;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 2px solid #fff;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+          ion-icon {
+            font-size: 14px;
+            color: #fff;
+          }
+        }
+
+        .status-badge {
+          padding: 4px 8px;
+          border-radius: 12px;
+          font-size: 12px;
+          font-weight: 500;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+
+          &.status-active {
+            background: rgba(76, 175, 80, 0.1);
+            color: #4CAF50;
+          }
+
+          &.status-expired {
+            background: rgba(244, 67, 54, 0.1);
+            color: #F44336;
+          }
+
+          &.status-cancelled {
+            background: rgba(158, 158, 158, 0.1);
+            color: #9E9E9E;
+          }
+        }
+
+        .member-actions {
+          display: flex;
+          align-items: center;
+          margin-left: 8px;
+
+          .arrow-icon {
+            font-size: 20px;
+            color: #666;
+            transition: transform 0.2s ease;
+          }
+
+          ion-button.whatsapp-btn {
+            --padding-start: 8px;
+            --padding-end: 8px;
+            --padding-top: 8px;
+            --padding-bottom: 8px;
+            height: 44px;
+            width: 44px;
+            border: 1px solid #eee;
+            /* Match filter-chip border */
+            border-radius: 50%;
+            /* Keep circular for icon button */
+            margin-right: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            /* Optional: match generic shadow if needed */
+
+            ion-icon {
+              font-size: 24px;
+            }
+          }
+        }
+
+        .member-item:hover .arrow-icon {
+          transform: translateX(2px);
+          color: var(--ion-color-primary);
+        }
+
+        .no-members {
+          color: #666;
+          font-style: italic;
+          margin-top: 40px;
+        }
+
+        .load-more-btn {
+          margin: 24px 16px 16px 16px;
+          --border-radius: 24px;
+          height: 44px;
+          font-weight: 500;
+        }
+
+        // Remove default ion-list styling
+        ion-list {
+          background: transparent !important;
+        }
+
+        // Responsive design
+        @media (max-width: 768px) {
+          .filter-row {
+            align-items: stretch;
+          }
+
+          .member-item {
+            margin: 6px 12px;
+            padding: 12px;
+          }
+
+          .member-avatar {
+            width: 48px;
+            height: 48px;
+            margin-right: 12px;
+          }
+
+          .member-info .member-name {
+            font-size: 15px;
+          }
+        }
+
+        // Dark mode support
+        body.dark {
+          .filters-container {
+            background: var(--ion-color-light) !important;
+            box-shadow: 0 2px 12px rgba(24, 26, 32, 0.25) !important;
+            border: 1px solid #232946 !important;
+          }
+
+          .filter-title {
+            color: #f4f4f5 !important;
+          }
+
+          .filter-chip {
+            background: #232946 !important;
+            color: #f4f4f5 !important;
+            border: 1px solid #3a4062 !important;
+
+            &.active {
+              background: #7f8ff4 !important;
+              color: #181a20 !important;
+              border-color: #7f8ff4 !important;
+            }
+
+            &:hover {
+              background: #2d3454 !important;
+            }
+          }
+
+          .member-item,
+          .custom-search-input,
+          .custom-add-button {
+            background: var(--ion-color-light) !important;
+            color: #f4f4f5 !important;
+            box-shadow: 0 2px 12px rgba(24, 26, 32, 0.25) !important;
+            border: 1px solid #232946 !important;
+          }
+
+          .member-name {
+            color: #f4f4f5 !important;
+          }
+        }
+      
+
+/* Floating Action Button (FAB) */
+.fab-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 999;
+}
+
+.fab-button {
+  --width: 56px;
+  --height: 56px;
+  --border-radius: 50%;
+  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin: 0;
+  
+  ion-icon {
+    font-size: 28px;
+  }
+
+  &:hover {
+    --box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    transform: scale(1.1);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}

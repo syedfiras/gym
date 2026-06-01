@@ -1,0 +1,106 @@
+<ion-header>
+  <app-toolbar [role]="'owner'" [title]="'All Members'"></app-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="search-button-container">
+    <!-- Search Input -->
+    <input type="search" placeholder="Search by Name or Phone" class="custom-search-input"
+      (input)="onSearchChange($event)">
+    <button class="custom-add-button" (click)="goToAddMember()">
+      + Add
+    </button>
+  </div>
+  <!-- Filters Section -->
+  <div class="filters-container">
+    <div class="filter-section">
+      <div class="filter-chips">
+        <div class="filter-chip" [class.active]="selectedFilter === 'all'"
+          (click)="selectedFilter = 'all'; onFilterChange()">
+          <ion-icon name="people-outline"></ion-icon>
+          <span>All</span>
+        </div>
+        <div class="filter-chip" [class.active]="selectedFilter === 'expired'"
+          (click)="selectedFilter = 'expired'; onFilterChange()">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          <span>Expired</span>
+        </div>
+        <div class="filter-chip" [class.active]="selectedFilter === 'expiring'"
+          (click)="selectedFilter = 'expiring'; onFilterChange()">
+          <ion-icon name="time-outline"></ion-icon>
+          <span>Expiring Soon</span>
+        </div>
+        <div class="filter-chip" [class.active]="selectedFilter === 'due'"
+          (click)="selectedFilter = 'due'; onFilterChange()">
+          <ion-icon name="wallet-outline"></ion-icon>
+          <span>Dues</span>
+        </div>
+        <div class="filter-chip" [class.active]="selectedFilter === 'pt'"
+          (click)="selectedFilter = 'pt'; onFilterChange()">
+          <ion-icon name="barbell-outline"></ion-icon>
+          <span>PT Members</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="loading && members.length === 0" class="members-list">
+    <div *ngFor="let i of [1,2,3,4,5]" class="member-item" style="pointer-events: none;">
+      <ion-skeleton-text animated
+        style="width: 56px; height: 56px; border-radius: 50%; margin-right: 16px;"></ion-skeleton-text>
+      <div style="flex: 1;">
+        <ion-skeleton-text animated
+          style="width: 50%; height: 20px; margin-bottom: 6px; border-radius: 4px;"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width: 30%; height: 16px; border-radius: 4px;"></ion-skeleton-text>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="error" class="ion-text-center ion-padding">{{ error }}</div>
+
+  <ion-list *ngIf="!error && (members.length > 0 || !loading)" class="members-list fade-in">
+    <div *ngFor="let member of members" class="member-item" (click)="goToMemberDetails(member)">
+      <div class="member-avatar" (click)="$event.stopPropagation(); viewFullPhoto(member)">
+        <img [src]="member.photo || '../../../assets/avatar.png'" alt="Member photo">
+        <!-- PT Badge on Avatar -->
+        <div *ngIf="member.has_personal_training" class="pt-badge-avatar">
+          <ion-icon name="barbell"></ion-icon>
+        </div>
+      </div>
+
+      <div class="member-info">
+        <h3 class="member-name">{{ member.first_name }} {{ member.last_name }}</h3>
+        <div class="member-status">
+          <span class="status-badge" [ngClass]="{
+              'status-active': member.current_membership?.status === 'active',
+              'status-expired': member.current_membership?.status === 'expired',
+              'status-cancelled': member.current_membership?.status === 'cancelled'
+            }">
+            {{ member.current_membership ? (member.current_membership.status | titlecase) : 'No Membership' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="member-actions">
+        <ion-button fill="clear" size="small" class="whatsapp-btn" (click)="openWhatsApp(member, $event)">
+          <ion-icon name="logo-whatsapp" color="success" slot="icon-only"></ion-icon>
+        </ion-button>
+        <ion-icon name="chevron-forward-outline" class="arrow-icon" color="primary"></ion-icon>
+      </div>
+    </div>
+
+    <div *ngIf="members.length === 0" class="ion-text-center ion-padding no-members">
+      No members found.
+    </div>
+
+    <ion-button *ngIf="currentPage < totalPages && !loading" expand="block" color="secondary" class="load-more-btn"
+      (click)="loadMore()">
+      Load More
+    </ion-button>
+  </ion-list>
+
+  <!-- Floating Action Button for Refresh -->
+  <div class="fab-container">
+    <ion-button class="fab-button" (click)="refreshMembers()">
+      <ion-icon name="refresh"></ion-icon>
+    </ion-button>
+  </div>
+</ion-content>

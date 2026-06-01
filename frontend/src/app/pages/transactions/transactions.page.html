@@ -1,0 +1,209 @@
+<ion-header>
+  <app-toolbar [role]="'owner'" [title]="'Transactions'" [showBackButton]="true"></app-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content pullingIcon="chevron-down" refreshingSpinner="crescent"></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <ion-spinner name="crescent" class="center-spinner"></ion-spinner>
+    <p>Loading...</p>
+  </div>
+
+  <div *ngIf="!isLoading">
+    <!-- Metric Cards Grid (2 per row on mobile) -->
+    <div class="metrics-grid">
+      <div class="metric-card total">
+        <div class="metric-icon">
+          <ion-icon name="trending-up-outline"></ion-icon>
+        </div>
+        <div class="metric-info">
+          <span class="metric-label">Total Revenue</span>
+          <span class="metric-value">₹{{ dashboardData.total_revenue | number:'1.0-0' }}</span>
+        </div>
+      </div>
+
+      <div class="metric-card today">
+        <div class="metric-icon">
+          <ion-icon name="today-outline"></ion-icon>
+        </div>
+        <div class="metric-info">
+          <span class="metric-label">Today</span>
+          <span class="metric-value">₹{{ dashboardData.todays_revenue | number:'1.0-0' }}</span>
+        </div>
+      </div>
+
+      <div class="metric-card month">
+        <div class="metric-icon">
+          <ion-icon name="calendar-outline"></ion-icon>
+        </div>
+        <div class="metric-info">
+          <span class="metric-label">This Month</span>
+          <span class="metric-value">₹{{ dashboardData.counts.revenue_this_month | number:'1.0-0' }}</span>
+        </div>
+      </div>
+
+      <div class="metric-card due" (click)="toggleDuesSection()">
+        <div class="metric-icon">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+        </div>
+        <div class="metric-info">
+          <span class="metric-label">Total Due</span>
+          <span class="metric-value">₹{{ totalDueAmount | number:'1.0-0' }}</span>
+        </div>
+        <ion-icon class="chevron" [name]="showDuesSection ? 'chevron-up' : 'chevron-down'"></ion-icon>
+      </div>
+    </div>
+
+    <!-- Dues Section (Collapsible) -->
+    <div class="dues-section" *ngIf="showDuesSection && membersWithDues.length > 0">
+      <div class="section-header">
+        <ion-icon name="people-outline"></ion-icon>
+        <span>Members with Dues ({{ membersWithDues.length }})</span>
+      </div>
+      <div class="dues-list">
+        <div class="due-item" *ngFor="let member of membersWithDues">
+          <div class="due-info" (click)="goToMember(member.member_id)">
+            <img [src]="member.photo || '../../../assets/avatar.png'" class="member-avatar" alt="">
+            <div class="member-details">
+              <span class="member-name">{{ member.first_name }} {{ member.last_name }}</span>
+              <span class="member-plan">{{ member.current_membership?.MembershipPlan?.plan_name || 'N/A' }}</span>
+            </div>
+          </div>
+          <div class="due-action">
+            <span class="due-amount">₹{{ getMemberDue(member) | number:'1.0-0' }}</span>
+            <ion-button size="small" fill="solid" color="warning" (click)="openPayDueModal(member)">
+              Pay
+            </ion-button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="dues-section empty" *ngIf="showDuesSection && membersWithDues.length === 0">
+      <ion-icon name="checkmark-circle" color="success"></ion-icon>
+      <span>No pending dues!</span>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="filters-container">
+      <div class="filter-row">
+        <span class="filter-label">Period</span>
+        <ion-select [(ngModel)]="filters.period" (ionChange)="applyFilters()" interface="action-sheet" class="month-select">
+          <ion-select-option value="all">All Time</ion-select-option>
+          <ion-select-option value="today">Today</ion-select-option>
+          <ion-select-option *ngFor="let month of monthOptions" [value]="month.value">
+            {{ month.label }}
+          </ion-select-option>
+        </ion-select>
+      </div>
+      <div class="filtered-sum-banner" *ngIf="filters.period !== 'all' || filters.type !== 'all' || filters.search">
+        <div class="sum-label">Revenue for current selection</div>
+        <div class="sum-value">₹{{ filteredTotal | number:'1.0-2' }}</div>
+      </div>
+      <div class="filter-row">
+        <span class="filter-label">Type</span>
+        <div class="filter-chips scrollable">
+          <div class="filter-chip" [class.active]="filters.type === 'all'" (click)="filters.type = 'all'; applyFilters()">All</div>
+          <div class="filter-chip" [class.active]="filters.type === 'membership_payment'" (click)="filters.type = 'membership_payment'; applyFilters()">Membership</div>
+          <div class="filter-chip" [class.active]="filters.type === 'admission_fee'" (click)="filters.type = 'admission_fee'; applyFilters()">Admission</div>
+          <div class="filter-chip" [class.active]="filters.type === 'personal_training'" (click)="filters.type = 'personal_training'; applyFilters()">PT</div>
+          <div class="filter-chip" [class.active]="filters.type === 'other_fee'" (click)="filters.type = 'other_fee'; applyFilters()">Other</div>
+        </div>
+      </div>
+      <ion-searchbar
+        [(ngModel)]="filters.search"
+        (ionChange)="applyFilters()"
+        placeholder="Search by member or description"
+        animated
+        class="custom-searchbar">
+      </ion-searchbar>
+    </div>
+
+    <!-- Transaction List -->
+    <div class="transactions-list">
+      <div class="transaction-item" *ngFor="let t of filteredTransactions">
+        <div class="tx-icon" [ngClass]="t.transaction_type">
+          <ion-icon [name]="
+            t.transaction_type === 'membership_payment' ? 'card-outline' :
+            t.transaction_type === 'admission_fee' ? 'person-add-outline' :
+            t.transaction_type === 'personal_training' ? 'barbell-outline' : 'cash-outline'
+          "></ion-icon>
+        </div>
+        <div class="tx-details">
+          <div class="tx-main">
+            <span class="tx-type">{{ t.transaction_type.replace('_', ' ') | titlecase }}</span>
+            <span class="tx-amount">₹{{ t.amount | number:'1.0-0' }}</span>
+          </div>
+          <div class="tx-meta">
+            <span *ngIf="t.Member?.first_name">{{ t.Member.first_name }} {{ t.Member.last_name || '' }}</span>
+            <span>{{ t.transaction_date | date:'MMM d, h:mm a' }}</span>
+            <span class="tx-method">{{ t.payment_method | titlecase }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="filteredTransactions.length === 0" class="empty-state">
+        <ion-icon name="receipt-outline"></ion-icon>
+        <h3>No transactions found</h3>
+        <p>Try adjusting your filters</p>
+      </div>
+    </div>
+  </div>
+</ion-content>
+
+<!-- Pay Due Modal -->
+<div class="pay-due-modal-overlay" *ngIf="showPayDueModal" (click)="closePayDueModal()">
+  <div class="pay-due-modal" (click)="$event.stopPropagation()">
+    <div class="pay-due-modal-header">
+      <ion-icon name="wallet-outline"></ion-icon>
+      <h2>Record Payment</h2>
+      <ion-button fill="clear" class="close-btn" (click)="closePayDueModal()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </div>
+    <div class="pay-due-modal-body">
+      <div class="member-info-row">
+        <ion-icon name="person-circle"></ion-icon>
+        <span>{{ payDueMemberName }}</span>
+      </div>
+      <div class="due-summary">
+        <span class="due-label">Balance Due</span>
+        <span class="due-amount">₹{{ payDueDueAmount | number:'1.2-2' }}</span>
+      </div>
+
+      <div class="form-group">
+        <label>Payment Amount</label>
+        <div class="input-wrapper">
+          <span class="currency-symbol">₹</span>
+          <input type="number" [(ngModel)]="payDueForm.amount" [max]="payDueDueAmount" min="1" placeholder="Enter amount">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Payment Method</label>
+        <div class="payment-methods">
+          <button class="method-btn" [class.active]="payDueForm.payment_method === 'cash'" (click)="payDueForm.payment_method = 'cash'">💵 Cash</button>
+          <button class="method-btn" [class.active]="payDueForm.payment_method === 'upi'" (click)="payDueForm.payment_method = 'upi'">📱 UPI</button>
+          <button class="method-btn" [class.active]="payDueForm.payment_method === 'card'" (click)="payDueForm.payment_method = 'card'">💳 Card</button>
+          <button class="method-btn" [class.active]="payDueForm.payment_method === 'bank_transfer'" (click)="payDueForm.payment_method = 'bank_transfer'">🏦 Bank</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Note (Optional)</label>
+        <input type="text" [(ngModel)]="payDueForm.note" placeholder="e.g., Partial payment">
+      </div>
+    </div>
+    <div class="pay-due-modal-footer">
+      <ion-button expand="block" class="submit-payment-btn" (click)="submitPayDue()" [disabled]="isLoading">
+        <ion-icon name="checkmark-circle" slot="start" *ngIf="!isLoading"></ion-icon>
+        <ion-spinner name="crescent" *ngIf="isLoading"></ion-spinner>
+        {{ isLoading ? 'Processing...' : 'Confirm Payment' }}
+      </ion-button>
+    </div>
+  </div>
+</div>

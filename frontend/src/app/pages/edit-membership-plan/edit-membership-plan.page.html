@@ -1,0 +1,151 @@
+<ion-header>
+  <app-toolbar [role]="'owner'" [title]="'Edit Membership'" [showBackButton]="true"></app-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="edit-membership-page ion-padding">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loader-container">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Loading membership details...</div>
+  </div>
+
+  <!-- Error State -->
+  <!-- <div *ngIf="error" class="error-message">{{ errorMessage }}</div> -->
+
+  <!-- Form Content -->
+  <div *ngIf="!loading && !errorMessage && originalMembership" class="form-wrapper">
+    <!-- Member Info Header -->
+    <ion-card class="member-card">
+      <ion-card-content>
+        <div class="member-info">
+          <ion-icon name="person-circle" class="member-icon"></ion-icon>
+          <div class="member-details">
+            <h2>{{ memberName }}</h2>
+            <p>Plan: {{ originalMembership.MembershipPlan?.plan_name }}</p>
+            <p>Gym: {{ originalMembership.Gym?.gym_name }}</p>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Membership Info Card -->
+    <ion-card class="info-card">
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="information-circle"></ion-icon>
+          Membership Information
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="info-row">
+          <span class="info-label">Plan Price:</span>
+          <span class="info-value">₹{{ planPrice | number:'1.2-2' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Actual Paid:</span>
+          <span class="info-value">₹{{ actualPaidAmount | number:'1.2-2' }}</span>
+        </div>
+        <div class="info-row due-row">
+          <span class="info-label">Due Amount:</span>
+          <span class="info-value due-amount">₹{{ calculatedDue | number:'1.2-2' }}</span>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Edit Form -->
+    <ion-card class="form-card">
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="pencil"></ion-icon>
+          Edit Membership Details
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <form [formGroup]="editMembershipForm" (ngSubmit)="onSubmit()">
+          <!-- Start Date -->
+          <ion-item class="form-item">
+            <ion-label position="stacked">Start Date</ion-label>
+            <ion-input 
+              type="date" 
+              formControlName="start_date"
+              (ionChange)="onPaidAmountChange()">
+            </ion-input>
+            <ion-note *ngIf="editMembershipForm.get('start_date')?.invalid && editMembershipForm.get('start_date')?.touched" color="danger">
+              Start date is required
+            </ion-note>
+          </ion-item>
+
+          <!-- End Date -->
+          <ion-item class="form-item">
+            <ion-label position="stacked">End Date</ion-label>
+            <ion-input 
+              type="date" 
+              formControlName="end_date"
+              (ionChange)="onPaidAmountChange()">
+            </ion-input>
+            <ion-note *ngIf="editMembershipForm.get('end_date')?.invalid && editMembershipForm.get('end_date')?.touched" color="danger">
+              End date is required
+            </ion-note>
+          </ion-item>
+
+          <!-- Actual Price Paid -->
+          <ion-item class="form-item">
+            <ion-label position="stacked">Amount Paid (₹)</ion-label>
+            <ion-input 
+              type="number" 
+              formControlName="actual_price_paid"
+              placeholder="Enter amount paid"
+              (ionChange)="onPaidAmountChange()"
+              [max]="planPrice * 1.5">
+            </ion-input>
+            <ion-note *ngIf="editMembershipForm.get('actual_price_paid')?.invalid && editMembershipForm.get('actual_price_paid')?.touched" color="danger">
+              Amount must be 0 or greater
+            </ion-note>
+          </ion-item>
+
+          <!-- Payment Status (Auto-filled but editable) -->
+          <ion-item class="form-item">
+            <ion-label position="stacked">Payment Status</ion-label>
+            <ion-select formControlName="payment_status">
+              <ion-select-option value="due">Due</ion-select-option>
+              <ion-select-option value="partially_paid">Partially Paid</ion-select-option>
+              <ion-select-option value="paid">Paid</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <!-- Due Amount Display -->
+          <div class="due-display">
+            <ion-icon name="wallet-outline"></ion-icon>
+            <div>
+              <div class="due-label">Due Amount to Collect:</div>
+              <div class="due-value">₹{{ calculatedDue | number:'1.2-2' }}</div>
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="form-actions">
+            <ion-button 
+              expand="block" 
+              color="primary" 
+              type="submit"
+              [disabled]="editMembershipForm.invalid || saving || !hasChanges">
+              <ion-icon name="checkmark-circle" slot="start" *ngIf="!saving"></ion-icon>
+              <ion-spinner name="crescent" *ngIf="saving" slot="start"></ion-spinner>
+              {{ saving ? 'Updating...' : 'Update Membership' }}
+            </ion-button>
+
+            <ion-button 
+              expand="block" 
+              color="medium" 
+              type="button"
+              (click)="onCancel()"
+              [disabled]="saving">
+              <ion-icon name="close-circle" slot="start"></ion-icon>
+              Cancel
+            </ion-button>
+          </div>
+        </form>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

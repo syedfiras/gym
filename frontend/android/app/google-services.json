@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "44997373663",
+    "project_id": "gymnetsolution-1bef6",
+    "storage_bucket": "gymnetsolution-1bef6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:44997373663:android:dcdc5e5e71a49ebc85836a",
+        "android_client_info": {
+          "package_name": "io.ionic.starter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBx6WsNRv22d8CtFsKnhcFcytsJO8MCEqg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
